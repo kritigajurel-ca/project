@@ -1,13 +1,28 @@
+# Use Ubuntu 20.04 as base
 FROM ubuntu:20.04
-RUN apt-get update -y
-COPY . /app
+
+# Avoid interactive prompts during package install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set working directory
 WORKDIR /app
-RUN set -xe \
-    && apt-get update -y \
-    && apt-get install -y python3-pip \
-    && apt-get install -y mysql-client 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-EXPOSE 8080
-ENTRYPOINT [ "python3" ]
-CMD [ "app.py" ]
+
+# Copy requirements first (for caching)
+COPY requirements.txt /app/
+
+# Install required packages and Python dependencies
+RUN apt-get update -y \
+    && apt-get install -y python3-pip python3-dev default-libmysqlclient-dev build-essential mysql-client curl \
+    && pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the rest of the application
+COPY . /app
+
+# Expose port 81 for Flask
+EXPOSE 81
+
+# Run the Flask application
+CMD ["python3", "app.py"]

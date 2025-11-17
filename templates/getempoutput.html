@@ -1,35 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Employee Information</title>
+    <title>Employee Information</title>
 </head>
+<body style="background-image: url('{{ url_for('static', filename=bg_image_path) }}'); background-size: cover;">
 <center>
-	<font color="black" size="5" style="font-family: avenir">
+    <h1 style="color: DodgerBlue;">Employee Information - {{ header }}</h1>
 
-		<h1 style="color: DodgerBlue">Employee Information</h1>
+    {% if id %}
+    <form>
+        Employee ID:<br> {{ id }} <br><br>
+        First Name:<br> {{ fname }} <br><br>
+        Last Name:<br> {{ lname }} <br><br>
+        Primary Skill:<br> {{ interest }} <br><br>
+        Location:<br> {{ location }} <br><br>
+    </form>
+    {% else %}
+        <p>Employee not found.</p>
+    {% endif %}
 
-		<body style="background: {{ color }};">
-
-			<form>
-
-				<div>
-
-			  		Employee ID:<br> {{ id }} <br><br>
-
-			  		First Name:<br> {{ fname }} <br><br>
-
-			  		Last Name:<br> {{ lname }} <br><br>
-
-			  		Primary Interest:<br> {{ interest }} <br><br>
-
-			  		Location:<br> {{ location }} <br><br>
-			  		
-			  	</div>
-
-			</form>
-			<a href="{{ url_for('home') }}">Back</a>
-		</body>
-
-	</font>
+    <a href="{{ url_for('home') }}">Back</a>
 </center>
+</body>
 </html>
