@@ -1,29 +1,38 @@
-name: Build and Push Docker to ECR
+name: Deploy Docker Image to ECR
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Login to ECR
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and push Docker image
-      run: |
-        IMAGE_URI=992382762279.dkr.ecr.us-east-1.amazonaws.com/clo835-app
-        docker build -t $IMAGE_URI .
-        docker push $IMAGE_URI
+      - name: Build Docker image
+        run: |
+          docker build -t clo835-app:1.0 .
+
+      - name: Tag Docker image for ECR
+        run: |
+          docker tag clo835-app:1.0 992382762279.dkr.ecr.us-east-1.amazonaws.com/clo835-app:1.0
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push 992382762279.dkr.ecr.us-east-1.amazonaws.com/clo835-app:1.0
+
